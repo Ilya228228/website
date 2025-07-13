@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import BackupsTable from './BackupsTable';
 
-const BackupsTab = () => {
+const BackupsTab = ({ onModalOpen }) => {
   const [backups, setBackups] = useState([
-    { id: 1, name: 'backup_20230708.zip', date: '2023-07-08 02:00', size: '2.4 GB', status: 'Завершено' },
-    { id: 2, name: 'backup_20230707.zip', date: '2023-07-07 02:00', size: '2.3 GB', status: 'Завершено' }
+    { 
+      id: 1, 
+      name: 'backup_20230708.zip', 
+      date: '2023-07-08 02:00', 
+      size: '2.4 GB', 
+      status: 'Завершено'
+    },
+    { 
+      id: 2, 
+      name: 'backup_20230707.zip', 
+      date: '2023-07-07 02:00', 
+      size: '2.3 GB', 
+      status: 'Завершено'
+    }
   ]);
 
   const handleCreateBackup = () => {
