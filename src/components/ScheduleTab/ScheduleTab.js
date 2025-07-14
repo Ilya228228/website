@@ -17,14 +17,21 @@ const ScheduleTab = () => {
     name: 'Финансовая', 
     frequency: 'weekly', 
     time: '04:30',
-    weeklyDays: ['Пн', 'Ср', 'Пт']  // Добавлены дни недели
+    weeklyDays: ['Пн', 'Ср', 'Пт'] 
   },
   { 
     id: 3, 
     name: 'Архивная', 
     frequency: 'monthly', 
     time: '23:00',
-    monthlyDay: 15  // Добавлен день месяца
+    monthlyDay: 15 
+  },
+  { 
+    id: 4, 
+    name: 'Финальная копия', 
+    frequency: 'monthly', 
+    time: '03:00',
+    monthlyDay: 0  // 0 означает последний день месяца
   }
 ]);
 

@@ -9,7 +9,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
   const [dayOfMonth, setDayOfMonth] = useState(1);
 
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  const daysOfMonth = Array.from({ length: 31 }, (_, i) => i + 1);
+  const daysOfMonth = Array.from({ length: 27 }, (_, i) => i + 1);
 
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
@@ -22,12 +22,14 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    const monthlyDay = dayOfMonth === 'last' ? 0 : dayOfMonth;
+
     const scheduleData = { 
       name, 
       frequency, 
       time,
       ...(frequency === 'weekly' && { weeklyDays: selectedDays }),
-      ...(frequency === 'monthly' && { monthlyDay: dayOfMonth })
+      ...(frequency === 'monthly' && { monthlyDay })
     };
     
     onCreate(scheduleData);
@@ -98,6 +100,13 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                     {day}
                   </button>
                 ))}
+                <button
+                type="button"
+                className={`day-btn last-day ${dayOfMonth === 'last' ? 'selected' : ''}`}
+                onClick={() => setDayOfMonth('last')}
+              >
+                Последний день
+              </button>
               </div>
             </div>
           )}

@@ -57,6 +57,7 @@ h1 {
   border-bottom: 3px solid var(--secondary);
   color: var(--secondary);
   font-weight: bold;
+  background-color: #f1f5ff;
 }
 
 .tab-panel {
@@ -351,4 +352,36 @@ th {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
+}
+
+.month-day-selector:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.month-day-selector .last-day {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  color: #333;
+  font-weight: 500;
+  width: 100%;
+  max-width: 124px;
+}
+
+.month-day-selector .last-day:hover {
+  background-color: #e9ecef;
+  border-color: #d1d8e0;
+}
+
+.month-day-selector .last-day.selected {
+  background-color: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+}
+
+.month-day-selector .day-btn:last-child {
+  grid-column: span 4;
+  justify-self: center;
 }

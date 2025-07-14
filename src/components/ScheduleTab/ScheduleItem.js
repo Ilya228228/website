@@ -17,11 +17,15 @@ const ScheduleItem = ({ schedule, onDelete }) => {
         );
       
       case 'monthly':
+        const dayDisplay = schedule.monthlyDay === 0 
+          ? 'последний день' 
+          : `${schedule.monthlyDay} число`;
+
         return (
           <>
             <span>Каждый месяц </span>
-            <span className="highlight-day">{schedule.monthlyDay}</span>
-            <span> числа в {schedule.time}</span>
+            <span className="highlight-day">{dayDisplay}</span>
+            <span> в {schedule.time}</span>
           </>
         );
       
