@@ -1,11 +1,6 @@
 import React from 'react';
 
 const ScheduleItem = ({ schedule, onDelete }) => {
-  const frequencyMap = {
-    daily: 'Ежедневно',
-    weekly: 'Еженедельно',
-    monthly: 'Ежемесячно'
-  };
 
   // Форматирование информации о расписании
   const getScheduleInfo = () => {
@@ -22,11 +17,15 @@ const ScheduleItem = ({ schedule, onDelete }) => {
         );
       
       case 'monthly':
+        const dayDisplay = schedule.monthlyDay === 0 
+          ? 'последний день' 
+          : `${schedule.monthlyDay} число`;
+
         return (
           <>
             <span>Каждый месяц </span>
-            <span className="highlight-day">{schedule.monthlyDay}</span>
-            <span> числа в {schedule.time}</span>
+            <span className="highlight-day">{dayDisplay}</span>
+            <span> в {schedule.time}</span>
           </>
         );
       
@@ -39,10 +38,6 @@ const ScheduleItem = ({ schedule, onDelete }) => {
     <div className="schedule-item">
       <div className="schedule-info">
         <h3>{schedule.name}</h3>
-        <p>
-          {frequencyMap[schedule.frequency]} 
-          {schedule.frequency === 'daily' && ` в ${schedule.time}`}
-        </p>
         <div className="schedule-details">
           {getScheduleInfo()}
         </div>

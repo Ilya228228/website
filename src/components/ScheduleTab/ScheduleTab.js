@@ -1,39 +1,56 @@
 import React, { useState } from 'react';
 import CreateScheduleModal from './CreateScheduleModal';
 import ScheduleItem from './ScheduleItem';
-import { useModal } from '../common/ModalManager';
+import './../../styles/modal.css';
 
 const ScheduleTab = () => {
-  const { openModal } = useModal();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [schedules, setSchedules] = useState([
-    { id: 1, name: 'Основная копия', frequency: 'daily', time: '02:00' },
-    { id: 2, name: 'Финансовая', frequency: 'weekly', time: '04:30', weeklyDays: ['Пн', 'Ср', 'Пт'] },
-    { id: 3, name: 'Архивная', frequency: 'monthly', time: '23:00', monthlyDay: 15 }
-  ]);
+  { 
+    id: 1, 
+    name: 'Основная копия', 
+    frequency: 'daily', 
+    time: '02:00' 
+  },
+  { 
+    id: 2, 
+    name: 'Финансовая', 
+    frequency: 'weekly', 
+    time: '04:30',
+    weeklyDays: ['Пн', 'Ср', 'Пт'] 
+  },
+  { 
+    id: 3, 
+    name: 'Архивная', 
+    frequency: 'monthly', 
+    time: '23:00',
+    monthlyDay: 15 
+  },
+  { 
+    id: 4, 
+    name: 'Финальная копия', 
+    frequency: 'monthly', 
+    time: '03:00',
+    monthlyDay: 0  // 0 означает последний день месяца
+  }
+]);
 
   const handleCreateSchedule = (newSchedule) => {
     setSchedules([...schedules, { ...newSchedule, id: Date.now() }]);
+    setIsModalOpen(false);
   };
 
   const handleDeleteSchedule = (id) => {
     setSchedules(schedules.filter(s => s.id !== id));
   };
 
-  const openCreateModal = () => {
-    openModal(
-      <CreateScheduleModal 
-        onCreate={handleCreateSchedule} 
-      />
-    );
-  };
-
   return (
     <div className="tab-panel">
       <div className="header-row">
-        <h2>Расписание резервного копирования</h2>
+        <h2>Расписания резервного копирования</h2>
         <button 
           className="btn create-btn"
-          onClick={openCreateModal}
+          onClick={() => setIsModalOpen(true)}
         >
           Создать расписание
         </button>
@@ -48,6 +65,13 @@ const ScheduleTab = () => {
           />
         ))}
       </div>
+
+      {isModalOpen && (
+        <CreateScheduleModal
+          onClose={() => setIsModalOpen(false)}
+          onCreate={handleCreateSchedule}
+        />
+      )}
     </div>
   );
 };

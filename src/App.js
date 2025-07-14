@@ -9,14 +9,9 @@ import './styles/main.css';
 function App() {
   const [activeTab, setActiveTab] = useState('schedule');
 
-  const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
-  };
-
   const renderTab = () => {
     switch(activeTab) {
-      case 'schedule': 
-        return <ScheduleTab />;
+      case 'schedule': return <ScheduleTab />;
       case 'backups': return <BackupsTab />;
       case 'restore': return <RestoreTab />;
       case 'cleanup': return <CleanupTab />;
@@ -26,10 +21,7 @@ function App() {
 
   return (
     <div className="app">
-      <TabNavigation 
-        activeTab={activeTab} 
-        setActiveTab={handleTabChange} 
-      />
+      <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
       <div className="tab-content">
         {renderTab()}
       </div>

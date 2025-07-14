@@ -9,18 +9,16 @@ const TabNavigation = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="tabs-container">
-      <div className="tabs">
-        {tabs.map(tab => (
-          <div 
-            key={tab.id}
-            className={`tab-item ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </div>
-        ))}
-      </div>
+    <div className="tabs">
+      {tabs.map(tab => (
+        <button
+          key={tab.id}
+          className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
+          onClick={() => setActiveTab(tab.id)}
+        >
+          {tab.label}
+        </button>
+      ))}
     </div>
   );
 };
