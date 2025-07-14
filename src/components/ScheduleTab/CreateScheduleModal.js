@@ -5,10 +5,32 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
   const [name, setName] = useState('');
   const [frequency, setFrequency] = useState('daily');
   const [time, setTime] = useState('00:00');
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [dayOfMonth, setDayOfMonth] = useState(1);
+
+  const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const daysOfMonth = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const toggleDay = (day) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter(d => d !== day));
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreate({ name, frequency, time });
+    
+    const scheduleData = { 
+      name, 
+      frequency, 
+      time,
+      ...(frequency === 'weekly' && { weeklyDays: selectedDays }),
+      ...(frequency === 'monthly' && { monthlyDay: dayOfMonth })
+    };
+    
+    onCreate(scheduleData);
   };
 
   return (
@@ -41,6 +63,44 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
               <option value="monthly">Ежемесячно</option>
             </select>
           </div>
+          
+          {/* Блок выбора дней недели для еженедельного расписания */}
+          {frequency === 'weekly' && (
+            <div className="form-group">
+              <label>Дни недели:</label>
+              <div className="days-selector">
+                {daysOfWeek.map((day, index) => (
+                  <button
+                    key={day}
+                    type="button"
+                    className={`day-btn ${selectedDays.includes(day) ? 'selected' : ''}`}
+                    onClick={() => toggleDay(day)}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Блок выбора дня месяца для ежемесячного расписания */}
+          {frequency === 'monthly' && (
+            <div className="form-group">
+              <label>День месяца:</label>
+              <div className="month-day-selector">
+                {daysOfMonth.map(day => (
+                  <button
+                    key={day}
+                    type="button"
+                    className={`day-btn ${dayOfMonth === day ? 'selected' : ''}`}
+                    onClick={() => setDayOfMonth(day)}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           
           <div className="form-group">
             <label>Время:</label>

@@ -6,9 +6,27 @@ import './../../styles/modal.css';
 const ScheduleTab = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [schedules, setSchedules] = useState([
-    { id: 1, name: 'Основная копия', frequency: 'daily', time: '02:00' },
-    { id: 2, name: 'Финансовая', frequency: 'weekly', time: '04:30' }
-  ]);
+  { 
+    id: 1, 
+    name: 'Основная копия', 
+    frequency: 'daily', 
+    time: '02:00' 
+  },
+  { 
+    id: 2, 
+    name: 'Финансовая', 
+    frequency: 'weekly', 
+    time: '04:30',
+    weeklyDays: ['Пн', 'Ср', 'Пт']  // Добавлены дни недели
+  },
+  { 
+    id: 3, 
+    name: 'Архивная', 
+    frequency: 'monthly', 
+    time: '23:00',
+    monthlyDay: 15  // Добавлен день месяца
+  }
+]);
 
   const handleCreateSchedule = (newSchedule) => {
     setSchedules([...schedules, { ...newSchedule, id: Date.now() }]);
