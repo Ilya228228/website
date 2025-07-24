@@ -10,28 +10,34 @@ const ScheduleTab = () => {
     id: 1, 
     name: 'Основная копия', 
     frequency: 'daily', 
-    time: '02:00' 
+    time: '02:00',
+    databases: { db1: true, db2: true, db3: true },
+    storages: [
+      { type: 'local', path: '/var/backups' }
+    ]
   },
   { 
     id: 2, 
     name: 'Финансовая', 
     frequency: 'weekly', 
     time: '04:30',
-    weeklyDays: ['Пн', 'Ср', 'Пт'] 
+    weeklyDays: ['Пн', 'Ср', 'Пт'],
+    databases: { db1: true, db2: false, db3: true },
+    storages: [
+      { type: 'nfs', path: '192.168.1.100:/backups', mountPoint: '/mnt/nfs' },
+      { type: 'local', path: '/backups/finance' }
+    ]
   },
   { 
     id: 3, 
     name: 'Архивная', 
     frequency: 'monthly', 
     time: '23:00',
-    monthlyDay: 15 
-  },
-  { 
-    id: 4, 
-    name: 'Финальная копия', 
-    frequency: 'monthly', 
-    time: '03:00',
-    monthlyDay: 0  // 0 означает последний день месяца
+    monthlyDays: [15],
+    databases: { db1: false, db2: false, db3: true },
+    storages: [
+      { type: 'iscsi', path: 'iqn.2023-08.local:storage', mountPoint: '/mnt/iscsi' }
+    ]
   }
 ]);
 
