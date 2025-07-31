@@ -50,12 +50,11 @@ form {
 
 .form-group-storage header {
   font-weight: bolder;
-  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .form-group header {
   font-weight: bolder;
-  padding-top: 15px;
 }
 
 label {
@@ -75,14 +74,14 @@ input, select {
 .cancel-btn {
   background: none;
   color: black;
-  width: 330px;
+  width: 500px;
   height: 40px;
 }
 
 .create-modal-btn {
   background: #2464ec;
   color: white;
-  width: 330px;
+  width: 500px;
   height: 40px;
 }
 
@@ -90,7 +89,7 @@ input, select {
   background: white;
   border-radius: 8px;
   width: 100%;
-  width: 700px;
+  width: 800px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
@@ -115,7 +114,7 @@ input, select {
 
 .form-actions {
   display: flex;
-  justify-content: flex;
+  justify-content:space-between;
   gap: 10px;
   margin-top: 20px;
   padding-top: 15px;
