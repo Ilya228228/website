@@ -20,11 +20,42 @@
 }
 
 form {
-  padding: 20px;
+  padding-top: 15px;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  margin-top: -10px;
+}
+
+.form-group label {
+  margin-bottom: 2px;
+}
+
+.form-group input,
+.form-group select {
+  background: none;
+  height: 40px;
+}
+
+.form-group-storage {
+  margin-top: -10px;
+  font-size: 14px;
+}
+
+.form-group-storage input,
+.form-group-storage select {
+  padding: 6px 10px;
+  background: white;
+}
+
+.form-group-storage header {
+  font-weight: bolder;
+  padding-top: 16px;
+}
+
+.form-group header {
+  font-weight: bolder;
+  padding-top: 15px;
 }
 
 label {
@@ -42,15 +73,24 @@ input, select {
 }
 
 .cancel-btn {
-  background: #95a5a6;
+  background: none;
+  color: black;
+  width: 330px;
+  height: 40px;
+}
+
+.create-modal-btn {
+  background: #2464ec;
   color: white;
+  width: 330px;
+  height: 40px;
 }
 
 .modal {
   background: white;
   border-radius: 8px;
   width: 100%;
-  max-width: 500px;
+  width: 700px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
@@ -75,7 +115,7 @@ input, select {
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex;
   gap: 10px;
   margin-top: 20px;
   padding-top: 15px;

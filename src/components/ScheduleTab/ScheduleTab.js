@@ -8,21 +8,23 @@ const ScheduleTab = () => {
   const [schedules, setSchedules] = useState([
   { 
     id: 1, 
+    isScheduleActive: true,
     name: 'Основная копия', 
     frequency: 'daily', 
     time: '02:00',
-    databases: { db1: true, db2: true, db3: true },
+    databases: { db1: true, db2: true, db3: true, db4: true, db5: true },
     storages: [
       { type: 'local', path: '/var/backups' }
     ]
   },
   { 
     id: 2, 
+    isScheduleActive: true,
     name: 'Финансовая', 
     frequency: 'weekly', 
     time: '04:30',
     weeklyDays: ['Пн', 'Ср', 'Пт'],
-    databases: { db1: true, db2: false, db3: true },
+    databases: { db1: true, db2: false, db3: true, db4: false, db5: true },
     storages: [
       { type: 'nfs', path: '192.168.1.100:/backups', mountPoint: '/mnt/nfs' },
       { type: 'local', path: '/backups/finance' }
@@ -30,11 +32,12 @@ const ScheduleTab = () => {
   },
   { 
     id: 3, 
+    isScheduleActive: false,
     name: 'Архивная', 
     frequency: 'monthly', 
     time: '23:00',
     monthlyDays: [15],
-    databases: { db1: false, db2: false, db3: true },
+    databases: { db1: false, db2: false, db3: true, db4: false, db5: false },
     storages: [
       { type: 'iscsi', path: 'iqn.2023-08.local:storage', mountPoint: '/mnt/iscsi' }
     ]

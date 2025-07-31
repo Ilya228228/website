@@ -43,6 +43,8 @@ const ScheduleItem = ({ schedule, onDelete }) => {
     if (schedule.databases?.db1) selected.push('БД1');
     if (schedule.databases?.db2) selected.push('БД2');
     if (schedule.databases?.db3) selected.push('БД3');
+    if (schedule.databases?.db4) selected.push('БД4');
+    if (schedule.databases?.db5) selected.push('БД5');
     
     return selected.join(', ') || 'не выбраны';
   };
@@ -76,7 +78,11 @@ const ScheduleItem = ({ schedule, onDelete }) => {
 
   return (
   <div className="schedule-item">
-    <div className="schedule-info">
+    <div className={`status-indicator ${schedule.isScheduleActive ? 'active' : 'inactive'}`}></div>
+    <div 
+    className="schedule-info" 
+    style={{ paddingLeft: '25px' }}
+    >
       <h3>{schedule.name}</h3>
       <div className="schedule-details">
         {getScheduleInfo()}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './../../styles/modal.css';
 
 const CreateScheduleModal = ({ onClose, onCreate }) => {
+  // Состояния
   const [name, setName] = useState('');
   const [frequency, setFrequency] = useState('daily');
   const [time, setTime] = useState('00:00');
@@ -10,36 +11,25 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
   const [databases, setDatabases] = useState({
     db1: true,
     db2: true,
-    db3: true
+    db3: true,
+    db4: true,
+    db5: true
   });
   const [storages, setStorages] = useState([
-    { type: '', path: '', mountPoint: '' }
+    { 
+      type: '', 
+      path: '', 
+      mountPoint: '', 
+      isSaved: false, 
+      wasSaved: false // Добавляем флаг, было ли хранилище сохранено ранее
+    }
   ]);
   const [errors, setErrors] = useState({});
+  const [isScheduleActive, setIsScheduleActive] = useState(true); // Состояние для галочки
+  const [originalStorageValues, setOriginalStorageValues] = useState({});
 
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const daysOfMonth = Array.from({ length: 27 }, (_, i) => i + 1);
-
-  // Функции для работы с днями недели/месяца
-  const toggleDay = (day) => {
-    setSelectedDays(prev => 
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
-  };
-
-  const toggleMonthDay = (day) => {
-    setSelectedMonthDays(prev => 
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
-  };
-
-  // Функции для работы с базами данных
-  const handleDatabaseToggle = (db) => {
-    setDatabases({
-      ...databases,
-      [db]: !databases[db]
-    });
-  };
 
   // Функции для работы с хранилищами
   const handleStorageTypeChange = (index, value) => {
@@ -66,7 +56,71 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
   };
 
   const addStorage = () => {
-    setStorages([...storages, { type: '', path: '', mountPoint: '' }]);
+    setStorages([...storages, { 
+      type: '', 
+      path: '', 
+      mountPoint: '', 
+      isSaved: false, 
+      wasSaved: false 
+    }]);
+  };
+
+  const saveStorage = (index) => {
+    const storage = storages[index];
+    const newErrors = {};
+    let hasError = false;
+    
+    if (!storage.type) {
+      newErrors.type = 'Выберите тип хранилища';
+      hasError = true;
+    }
+    
+    if (!storage.path) {
+      newErrors.path = 'Укажите путь до хранилища';
+      hasError = true;
+    }
+    
+    if (storage.type !== 'local' && !storage.mountPoint) {
+      newErrors.mountPoint = 'Укажите точку монтирования';
+      hasError = true;
+    }
+    
+    if (hasError) {
+      setErrors(prev => ({
+        ...prev,
+        storages: {
+          ...prev.storages,
+          [index]: newErrors
+        }
+      }));
+      return;
+    }
+
+    const newStorages = [...storages];
+    newStorages[index].isSaved = true;
+    // Сохраняем информацию, что хранилище было сохранено ранее
+    newStorages[index].wasSaved = true; 
+    setStorages(newStorages);
+    
+    // Очищаем ошибки для этого хранилища
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      if (newErrors.storages && newErrors.storages[index]) {
+        delete newErrors.storages[index];
+      }
+      return newErrors;
+    });
+  };
+
+  const editStorage = (index) => {
+    setOriginalStorageValues({
+      ...originalStorageValues,
+      [index]: {...storages[index]}
+    });
+    
+    const newStorages = [...storages];
+    newStorages[index].isSaved = false;
+    setStorages(newStorages);
   };
 
   const removeStorage = (index) => {
@@ -74,7 +128,45 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
       const newStorages = [...storages];
       newStorages.splice(index, 1);
       setStorages(newStorages);
+    } else {
+      // Сбросить единственное хранилище
+      setStorages([{ type: '', path: '', mountPoint: '', isSaved: false }]);
     }
+    
+    // Очищаем ошибки для этого хранилища
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      if (newErrors.storages && newErrors.storages[index]) {
+        delete newErrors.storages[index];
+      }
+      return newErrors;
+    });
+  };
+
+  // Функция для переключения состояния галочки
+  const toggleScheduleActive = () => {
+    setIsScheduleActive(!isScheduleActive);
+  };
+
+  // Функции для работы с днями недели/месяца
+  const toggleDay = (day) => {
+    setSelectedDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
+
+  const toggleMonthDay = (day) => {
+    setSelectedMonthDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
+
+  // Функции для работы с базами данных
+  const handleDatabaseToggle = (db) => {
+    setDatabases({
+      ...databases,
+      [db]: !databases[db]
+    });
   };
 
   // Обработка отправки формы
@@ -104,44 +196,9 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
     }
     
     // Валидация хранилищ
-    const storageErrors = [];
-    let hasStorageError = false;
-    let hasValidStorage = false;
-    
-    storages.forEach((storage, index) => {
-      const errors = {};
-      
-      if (!storage.type) {
-        errors.type = 'Выберите тип хранилища';
-        hasStorageError = true;
-      } else {
-        if (!storage.path) {
-          errors.path = 'Укажите путь';
-          hasStorageError = true;
-        }
-        
-        if (storage.type !== 'local' && !storage.mountPoint) {
-          errors.mountPoint = 'Укажите точку монтирования';
-          hasStorageError = true;
-        }
-        
-        // Проверяем есть ли хотя бы одно полностью заполненное хранилище
-        if (storage.type && storage.path && 
-            (storage.type === 'local' || storage.mountPoint)) {
-          hasValidStorage = true;
-        }
-      }
-      
-      storageErrors[index] = errors;
-    });
-    
-    if (!hasValidStorage) {
-      newErrors.storagesGlobal = 'Необходимо указать хотя бы одно хранилище';
-      hasError = true;
-    }
-    
-    if (hasStorageError) {
-      newErrors.storages = storageErrors;
+    const savedStorages = storages.filter(s => s.isSaved);
+    if (savedStorages.length === 0) {
+      newErrors.storagesGlobal = 'Необходимо добавить хотя бы одно хранилище';
       hasError = true;
     }
     
@@ -154,11 +211,13 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
     
     // Формируем данные для расписания
     const scheduleData = { 
+      isScheduleActive,
       name, 
       frequency, 
       time,
+      isActive: isScheduleActive, // Добавляем состояние активности
       databases,
-      storages: storages.filter(s => s.type && s.path), // Фильтруем пустые
+      storages: savedStorages,
       ...(frequency === 'weekly' && { weeklyDays: selectedDays }),
       ...(frequency === 'monthly' && { monthlyDays: selectedMonthDays })
     };
@@ -176,7 +235,10 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
         <div className="modal-content">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Название:</label>
+              <header>Основные настройки</header>
+            </div>
+            <div className="form-group">
+              <label>Название</label>
               <input
                 type="text"
                 value={name}
@@ -186,7 +248,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
             </div>
             
             <div className="form-group">
-              <label>Частота:</label>
+              <label>Частота</label>
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
@@ -200,7 +262,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
             {/* Блок выбора дней недели */}
             {frequency === 'weekly' && (
               <div className="form-group">
-                <label>Дни недели:</label>
+                <label>Дни недели</label>
                 {errors.weekly && <div className="error-message">{errors.weekly}</div>}
                 <div className="days-selector">
                   {daysOfWeek.map((day) => (
@@ -220,7 +282,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
             {/* Блок выбора дней месяца */}
             {frequency === 'monthly' && (
               <div className="form-group">
-                <label>Дни месяца:</label>
+                <label>Дни месяца</label>
                 {errors.monthly && <div className="error-message">{errors.monthly}</div>}
                 <div className="month-day-selector">
                   {daysOfMonth.map(day => (
@@ -246,7 +308,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
             
             {/* Блок выбора времени */}
             <div className="form-group">
-              <label>Время:</label>
+              <label>Время</label>
               <input
                 type="time"
                 value={time}
@@ -254,113 +316,243 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                 required
               />
             </div>
-            
-            {/* Блок выбора баз данных */}
+
+            {/* Галочка "Расписание активно" */}
             <div className="form-group">
-              <label>Компоненты:</label>
-              {errors.databases && <div className="error-message">{errors.databases}</div>}
-              <div className="databases-selector">
-                {['db1', 'db2', 'db3'].map(db => (
-                  <div 
-                    key={db}
-                    className={`database-item ${databases[db] ? 'selected' : ''}`}
-                    onClick={() => handleDatabaseToggle(db)}
-                  >
-                    <div className="custom-checkbox">
-                      {databases[db] && (
-                        <div className="check-icon">
-                          <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
-                            <path d="M1 5L5 9L13 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <span className="database-label">
-                      {db === 'db1' && 'БД1'}
-                      {db === 'db2' && 'БД2'}
-                      {db === 'db3' && 'БД3'}
-                    </span>
+              <div 
+                className={`active-item ${isScheduleActive ? 'selected' : ''}`}
+                onClick={toggleScheduleActive}
+              >
+                <div className="custom-checkbox">
+                  <div className="check-icon">
+                    <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+                            <path d="M1 5L5 9L13 1" stroke="white" strokeWidth="2"/>
+                    </svg>
                   </div>
-                ))}
+                </div>
+                <span className="active-label">Расписание активно</span>
               </div>
             </div>
             
-            {/* Блок хранилищ */}
-            <div className="form-group">
-              <label>Хранилища:</label>
-              {errors.storagesGlobal && <div className="error-message">{errors.storagesGlobal}</div>}
-              
-              {storages.map((storage, index) => {
-                const storageError = errors.storages?.[index] || {};
+            {/* Блок выбора баз данных */}
+              <div className="form-group">
+                <header>Компоненты</header>
+                {errors.databases && <div className="error-message">{errors.databases}</div>}
                 
-                return (
-                  <div key={index} className="storage-block">
-                    <div className="storage-row">
-                      <select
-                        value={storage.type}
-                        onChange={(e) => handleStorageTypeChange(index, e.target.value)}
-                        className={storageError.type ? 'error' : ''}
+                <div className="databases-grid">
+                  <div className="database-column">
+                    {['db1', 'db2', 'db3'].map(db => (
+                      <div 
+                        key={db}
+                        className={`database-item ${databases[db] ? 'selected' : ''}`}
+                        onClick={() => handleDatabaseToggle(db)}
                       >
-                        <option value="">Выберите тип хранилища</option>
-                        <option value="local">Локальное</option>
-                        <option value="nfs">NFS</option>
-                        <option value="iscsi">iSCSI</option>
-                      </select>
-                      
-                      <button 
-                        type="button" 
-                        className="remove-storage-btn"
-                        onClick={() => removeStorage(index)}
-                        disabled={storages.length <= 1}
-                      >
-                        ×
-                      </button>
-                    </div>
-                    {storageError.type && <div className="error-message">{storageError.type}</div>}
-                    
-                    <div className="input-group">
-                      <input
-                        type="text"
-                        placeholder="Путь до хранилища"
-                        value={storage.path}
-                        onChange={(e) => handleStoragePathChange(index, e.target.value)}
-                        className={storageError.path ? 'error' : ''}
-                      />
-                      {storageError.path && <div className="error-message">{storageError.path}</div>}
-                    </div>
-                    
-                    {storage.type !== 'local' && storage.type !== '' && (
-                      <div className="input-group">
-                        <input
-                          type="text"
-                          placeholder="Точка монтирования"
-                          value={storage.mountPoint}
-                          onChange={(e) => handleMountPointChange(index, e.target.value)}
-                          className={storageError.mountPoint ? 'error' : ''}
-                        />
-                        {storageError.mountPoint && <div className="error-message">{storageError.mountPoint}</div>}
+                        <div className="custom-checkbox">
+                          {databases[db] && (
+                            <div className="check-icon">
+                              <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+                                <path d="M1 5L5 9L13 1" stroke="white" strokeWidth="2"/>
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <span className="database-label">
+                          {db === 'db1' && 'БД1'}
+                          {db === 'db2' && 'БД2'}
+                          {db === 'db3' && 'БД3'}
+                        </span>
                       </div>
-                    )}
+                    ))}
                   </div>
-                );
-              })}
-              
+                  
+                  <div className="database-column">
+                    {['db4', 'db5'].map(db => (
+                      <div 
+                        key={db}
+                        className={`database-item ${databases[db] ? 'selected' : ''}`}
+                        onClick={() => handleDatabaseToggle(db)}
+                      >
+                        <div className="custom-checkbox">
+                          {databases[db] && (
+                            <div className="check-icon">
+                              <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+                                <path d="M1 5L5 9L13 1" stroke="white" strokeWidth="2"/>
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <span className="database-label">
+                          {db === 'db4' && 'БД4'}
+                          {db === 'db5' && 'БД5'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            
+           {/* Блок хранилищ */}
+          <div className="form-group-storage">
+            <div className='db-title'>
+              <header style={{fontSize: 'larger'}}>Хранилища</header>
               <button 
-                type="button" 
-                className="btn add-storage-btn"
-                onClick={addStorage}
+              type="button" 
+              className="btn add-storage-btn"
+              onClick={addStorage}
               >
                 + Добавить хранилище
               </button>
             </div>
             
-          
+            {errors.storagesGlobal && <div className="error-message">{errors.storagesGlobal}</div>}
+            
+            {storages.map((storage, index) => {
+              const storageError = errors.storages?.[index] || {};
+              
+              // Определяем классы для разных состояний
+              let storageBlockClass = 'storage-adding';
+              if (storage.isSaved) {
+                storageBlockClass = 'storage-saved';
+              } else if (storage.wasSaved) {
+                storageBlockClass = 'storage-editing';
+              }
+              
+              return (
+                <div key={index} className={storageBlockClass}>
+                  {storage.isSaved ? (
+                    // Режим просмотра сохраненного хранилища
+                    <div className="storage-view">
+                      <div className="storage-info">
+                        <span className="storage-value">
+                          {storage.type === 'local' && 'Локальное'}
+                          {storage.type === 'nfs' && 'NFS'}
+                          {storage.type === 'iscsi' && 'iSCSI'}
+                        </span>
+                        
+                        <div>
+                          <span className="storage-label">Путь до хранилища: </span>
+                          <span className="storage-value">{storage.path}</span>
+                        </div>
+                        
+                        {storage.type !== 'local' && (
+                          <div>
+                            <span className="storage-label">Точка монтирования: </span>
+                            <span className="storage-value">{storage.mountPoint}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="storage-actions">
+                        <button 
+                          type="button" 
+                          className="icon-btn"
+                          onClick={() => editStorage(index)}
+                          title="Изменить"
+                        >
+                          <pf-icon icon="edit" size="md"></pf-icon>
+                        </button>
+                        <button 
+                          type="button" 
+                          className="icon-btn"
+                          onClick={() => removeStorage(index)}
+                          title="Удалить"
+                        >
+                          <pf-icon icon="trash" size="md"></pf-icon>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    // Режим редактирования хранилища
+                    <div className="storage-edit">
+                      <div className="storage-info-header">
+                        {storage.wasSaved ? 'Редактировать хранилище' : 'Добавить новое хранилище'}
+                      </div>
+
+                      <div className='storage-info-red'>
+                        Тип
+                      </div>
+
+                      <div className="storage-row">
+                        <select
+                          value={storage.type}
+                          onChange={(e) => handleStorageTypeChange(index, e.target.value)}
+                          className={storageError.type ? 'error' : ''}
+                        >
+                          <option value="">Выберите тип</option>
+                          <option value="local">Локальное</option>
+                          <option value="nfs">NFS</option>
+                          <option value="iscsi">iSCSI</option>
+                        </select>
+                      </div>
+                      {storageError.type && <div className="error-message">{storageError.type}</div>}
+
+                      <div className="input-group-red">
+                        Путь до хранилища
+                        <input
+                          type="text"
+                          placeholder="/path/to/storage"
+                          value={storage.path}
+                          onChange={(e) => handleStoragePathChange(index, e.target.value)}
+                          className={storageError.path ? 'error' : ''}
+                        />
+                        {storageError.path && <div className="error-message">{storageError.path}</div>}
+                      </div>
+
+                      {storage.type !== 'local' && storage.type !== '' && (
+                        <div className="input-group-red">
+                          Точка монтирования
+                          <input
+                            type="text"
+                            placeholder="Точка монтирования"
+                            value={storage.mountPoint}
+                            onChange={(e) => handleMountPointChange(index, e.target.value)}
+                            className={storageError.mountPoint ? 'error' : ''}
+                          />
+                          {storageError.mountPoint && <div className="error-message">{storageError.mountPoint}</div>}
+                        </div>
+                      )}
+                      
+                      <div className="storage-edit-actions">
+                        <button 
+                          type="button" 
+                          className="btn save-storage-btn"
+                          onClick={() => saveStorage(index)}
+                        >
+                          {storage.wasSaved ? 'Сохранить изменения' : 'Добавить хранилище'}
+                        </button>
+                        <button 
+                          type="button" 
+                          className="btn cancel-storage-btn"
+                          onClick={() => {
+                            if (storage.wasSaved) {
+                              // Восстанавливаем оригинальные значения
+                              const newStorages = [...storages];
+                              if (originalStorageValues[index]) {
+                                newStorages[index] = {...originalStorageValues[index]};
+                              }
+                              newStorages[index].isSaved = true;
+                              setStorages(newStorages);
+                            } else {
+                              removeStorage(index);
+                            }
+                          }}
+                        >
+                          Отменить
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+            
             <div className="form-actions">
-              <button type="button" className="btn cancel-btn" onClick={onClose}>
-                Отмена
-              </button>
-              <button type="submit" className="btn create-btn">
+              <button type="submit" className="btn create-modal-btn">
                 Создать
+              </button>
+              <button style={{border: '1px solid #ddd'}} type="button" className="btn cancel-btn" onClick={onClose}>
+                Отмена
               </button>
             </div>
           </form>
