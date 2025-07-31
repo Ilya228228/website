@@ -393,17 +393,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
             
            {/* Блок хранилищ */}
           <div className="form-group-storage">
-            <div className='db-title'>
-              <header style={{fontSize: 'larger'}}>Хранилища</header>
-              <button 
-              type="button" 
-              className="btn add-storage-btn"
-              onClick={addStorage}
-              >
-                + Добавить хранилище
-              </button>
-            </div>
-            
+            <header style={{fontSize: 'larger'}}>Хранилища</header>
             {errors.storagesGlobal && <div className="error-message">{errors.storagesGlobal}</div>}
             
             {storages.map((storage, index) => {
@@ -545,6 +535,14 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                 </div>
               );
             })}
+            
+            <button 
+              type="button" 
+              className="btn add-storage-btn"
+              onClick={addStorage}
+            >
+              + Добавить хранилище
+            </button>
           </div>
             
             <div className="form-actions">
