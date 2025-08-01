@@ -57,7 +57,6 @@ h1 {
 .tab-btn.active {
   border-bottom: 3px solid var(--secondary);
   color: var(--secondary);
-  font-weight: bold;
   background-color: #f1f5ff;
 }
 
