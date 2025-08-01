@@ -15,15 +15,8 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
     db4: true,
     db5: true
   });
-  const [storages, setStorages] = useState([
-    { 
-      type: '', 
-      path: '', 
-      mountPoint: '', 
-      isSaved: false, 
-      wasSaved: false // Добавляем флаг, было ли хранилище сохранено ранее
-    }
-  ]);
+  const [storages, setStorages] = useState([]);
+  const [showAddButton, setShowAddButton] = useState(true);
   const [errors, setErrors] = useState({});
   const [isScheduleActive, setIsScheduleActive] = useState(true); // Состояние для галочки
   const [originalStorageValues, setOriginalStorageValues] = useState({});
@@ -63,6 +56,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
       isSaved: false, 
       wasSaved: false 
     }]);
+    setShowAddButton(false);
   };
 
   const saveStorage = (index) => {
@@ -110,6 +104,7 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
       }
       return newErrors;
     });
+    setShowAddButton(true);
   };
 
   const editStorage = (index) => {
@@ -141,6 +136,10 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
       }
       return newErrors;
     });
+    const remainingEditing = storages.filter((s, i) => i !== index && !s.isSaved);
+    if (remainingEditing.length === 0) {
+      setShowAddButton(true);
+    }
   };
 
   // Функция для переключения состояния галочки
@@ -526,14 +525,13 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                           className="btn cancel-storage-btn"
                           onClick={() => {
                             if (storage.wasSaved) {
-                              // Восстанавливаем оригинальные значения
+                              // Для существующего хранилища: просто выходим из режима редактирования
                               const newStorages = [...storages];
-                              if (originalStorageValues[index]) {
-                                newStorages[index] = {...originalStorageValues[index]};
-                              }
                               newStorages[index].isSaved = true;
                               setStorages(newStorages);
+                              setShowAddButton(true);
                             } else {
+                              // Для нового хранилища: удаляем его
                               removeStorage(index);
                             }
                           }}
@@ -547,13 +545,15 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
               );
             })}
             
-            <button 
-              type="button" 
-              className="btn add-storage-btn"
-              onClick={addStorage}
-            >
-              + Добавить хранилище
-            </button>
+            {showAddButton && (
+              <button 
+                type="button" 
+                className="btn add-storage-btn"
+                onClick={addStorage}
+              >
+                + Добавить хранилище
+              </button>
+            )}
           </div>
             
             <div className="form-actions">
