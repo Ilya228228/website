@@ -439,8 +439,8 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                           title="Изменить"
                         >
                           <svg
-                            width="16"
-                            height="16"
+                            width="14"
+                            height="14"
                             viewBox="0 0 512 512"
                             className="pf-icon-edit"
                             aria-hidden="true"
@@ -478,8 +478,8 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                           onChange={(e) => handleStorageTypeChange(index, e.target.value)}
                           className={storageError.type ? 'error' : ''}
                         >
-                          <option value="">Выберите тип</option>
-                          <option value="local">Локальное</option>
+                          <option value="" disabled selected hidden>Выберите тип</option>
+                          <option value="local">Локальное хранилище</option>
                           <option value="nfs">NFS</option>
                           <option value="iscsi">iSCSI</option>
                         </select>

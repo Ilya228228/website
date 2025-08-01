@@ -43,6 +43,7 @@ h1 {
   padding: 13px 25px;
   background: none;
   border: none;
+  border-bottom: 3px solid white;
   cursor: pointer;
   font-size: 16px;
   transition: all 0.3s;
@@ -50,6 +51,7 @@ h1 {
 
 .tab-btn:hover {
   background: var(--light);
+  border-bottom: 3px solid var(--light);
 }
 
 .tab-btn.active {
@@ -680,7 +682,7 @@ select.error,
 }
 
 .storage-info-header {
-  font-size: 110%;
+  font-size: 16px;
   font-weight: bolder;
   margin-bottom: -5px;
 }
