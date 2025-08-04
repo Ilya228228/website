@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import CreateScheduleModal from './CreateScheduleModal';
+import EditScheduleModal from './EditScheduleModal';
 import ScheduleItem from './ScheduleItem';
 import './../../styles/modal.css';
 
 const ScheduleTab = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState(null);
   const [schedules, setSchedules] = useState([
   { 
     id: 1, 
@@ -57,6 +60,18 @@ const ScheduleTab = () => {
     setSchedules(schedules.filter(s => s.id !== id));
   };
 
+  const handleEditSchedule = (schedule) => {
+    setEditingSchedule(schedule);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveSchedule = (updatedSchedule) => {
+    setSchedules(schedules.map(s => 
+      s.id === updatedSchedule.id ? updatedSchedule : s
+    ));
+    setIsEditModalOpen(false);
+  };
+
   return (
     <div className="tab-panel">
       <div className="header-row">
@@ -74,7 +89,8 @@ const ScheduleTab = () => {
           <ScheduleItem 
             key={schedule.id} 
             schedule={schedule} 
-            onDelete={handleDeleteSchedule} 
+            onDelete={handleDeleteSchedule}
+            onEdit={handleEditSchedule}
           />
         ))}
       </div>
@@ -83,6 +99,14 @@ const ScheduleTab = () => {
         <CreateScheduleModal
           onClose={() => setIsModalOpen(false)}
           onCreate={handleCreateSchedule}
+        />
+      )}
+      
+      {isEditModalOpen && (
+        <EditScheduleModal
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleSaveSchedule}
+          schedule={editingSchedule}
         />
       )}
     </div>

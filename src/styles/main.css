@@ -329,12 +329,7 @@ th {
 }
 
 .highlight-days {
-  background: #e3f2fd;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 500;
-  color: var(--secondary);
-  border: 1px solid #bbdefb;
+  font-weight: 600;
 }
 
 .highlight-day {

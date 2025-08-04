@@ -1,7 +1,7 @@
 import React from 'react';
 import '@patternfly/elements/pf-icon/pf-icon.js';
 
-const ScheduleItem = ({ schedule, onDelete }) => {
+const ScheduleItem = ({ schedule, onDelete, onEdit }) => {
 
   // Форматирование информации о расписании
   const getScheduleInfo = () => {
@@ -13,7 +13,7 @@ const ScheduleItem = ({ schedule, onDelete }) => {
             <span className="highlight-days">
               {schedule.weeklyDays?.join(', ') || 'не выбраны дни'}
             </span>
-            <span> в {schedule.time}</span>
+            <span className="highlight-days"> в {schedule.time}</span>
           </>
         );
       
@@ -28,12 +28,12 @@ const ScheduleItem = ({ schedule, onDelete }) => {
           <span className="highlight-days">
             {dayDisplays.join(', ')}
           </span>
-          <span> в {schedule.time}</span>
+          <span className="highlight-days"> в {schedule.time}</span>
         </>
       );
       
       default:
-        return `Ежедневно в ${schedule.time}`;
+        return <span className="highlight-days">Ежедневно в {schedule.time}</span>;
     }
   };
 
@@ -128,7 +128,7 @@ const ScheduleItem = ({ schedule, onDelete }) => {
       
       
       <div className="schedule-actions">
-        <button className="icon-btn">
+        <button className="icon-btn" onClick={() => onEdit(schedule)}>
           <pf-icon icon="cog" size="md"></pf-icon>
         </button>
         <button 
