@@ -45,8 +45,12 @@ const ScheduleItem = ({ schedule, onDelete }) => {
     if (schedule.databases?.db3) selected.push('БД3');
     if (schedule.databases?.db4) selected.push('БД4');
     if (schedule.databases?.db5) selected.push('БД5');
-    
-    return selected.join(', ') || 'не выбраны';
+
+    return selected.map((db, index) => (
+      <span key={index} className="database-tag">
+        {db}
+      </span>
+    ));
   };
 
   // Функция для отображения информации о хранилищах
@@ -65,11 +69,13 @@ const ScheduleItem = ({ schedule, onDelete }) => {
       }
       
       return (
-        <div key={index} className="storage-info">
-          <span className="storage-type">{typeName}: </span>
-          <span className="storage-path">{storage.path}</span>
-          {storage.type !== 'local' && storage.mountPoint && (
-            <span> (монт. в {storage.mountPoint})</span>
+        <div key={index} className="storage-block">
+          <div className="storage-type">{typeName}</div>
+          <div className="storage-path">{storage.path}</div>
+          {storage.mountPoint && (
+            <div className="storage-mount-point">
+              <span className="arrow">→</span> {storage.mountPoint}
+            </div>
           )}
         </div>
       );
@@ -78,31 +84,45 @@ const ScheduleItem = ({ schedule, onDelete }) => {
 
   return (
   <div className="schedule-item">
-    <div className={`status-indicator ${schedule.isScheduleActive ? 'active' : 'inactive'}`}></div>
-    <div 
-    className="schedule-info" 
-    style={{ paddingLeft: '25px' }}
+    <div
+    style={{ paddingLeft: '30px', paddingTop: '10px' }}
     >
-      <h3>{schedule.name}</h3>
+      <div className={`status-indicator ${schedule.isScheduleActive ? 'active' : 'inactive'}`}></div>
+      <div style={{fontSize:'16px'}}>
+        <h3>{schedule.name}</h3>
+      </div>
+
+      <div className={'description'}>
+        {schedule.description}
+      </div>
+
       <div className="schedule-details">
+        <pf-icon icon="clock" size="sm" style={{color: '#2464ec'}}></pf-icon>
         {getScheduleInfo()}
       </div>
+
+      <div className={"maxCopies"}>
+        Максимальное количество копий: 
+        <span>{schedule.maxCopies}</span>
+      </div>
+
       {/* Отображаем выбранные базы данных */}
       <div className="schedule-databases">
-        <span>Базы: </span>
-        <span className="highlight-dbs">
+        <span>Компоненты: </span>
+        <div className="database-tags">
           {getSelectedDatabases()}
-        </span>
+        </div>
       </div>
+
       {/* Блок хранилищ */}
-        {schedule.storages && schedule.storages.length > 0 && (
-          <div className="schedule-storages">
-            <span>Хранилища:</span>
-            <div className="storages-list">
-              {getStorageInfo()}
-            </div>
+      {schedule.storages && schedule.storages.length > 0 && (
+        <div className="schedule-storages">
+          <span>Хранилища:</span>
+          <div className="storages-list">
+            {getStorageInfo()}
           </div>
-        )}
+        </div>
+      )}
     </div>
     
       

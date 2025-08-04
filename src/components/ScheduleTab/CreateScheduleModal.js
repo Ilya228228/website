@@ -4,8 +4,10 @@ import './../../styles/modal.css';
 const CreateScheduleModal = ({ onClose, onCreate }) => {
   // Состояния
   const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
   const [frequency, setFrequency] = useState('daily');
   const [time, setTime] = useState('00:00');
+  const [maxCopies, setMaxCopies] = useState('');
   const [selectedDays, setSelectedDays] = useState([]);
   const [selectedMonthDays, setSelectedMonthDays] = useState([]);
   const [databases, setDatabases] = useState({
@@ -23,6 +25,43 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
 
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const daysOfMonth = Array.from({ length: 27 }, (_, i) => i + 1);
+
+  // Функция обработки изменений
+  const handleMaxCopiesChange = (e) => {
+    const value = e.target.value;
+    
+    // Разрешаем пустую строку для очистки поля
+    if (value === '') {
+      setMaxCopies('');
+      return;
+    }
+    
+    // Парсим введенное значение как целое число
+    const numValue = parseInt(value, 10);
+    
+    // Игнорируем нечисловые вводы
+    if (isNaN(numValue)) return;
+    
+    // Корректируем значение если < 1
+    if (numValue < 1) {
+      setMaxCopies('1');
+    } else {
+      setMaxCopies(value);
+    }
+  };
+
+// Функция обработки потери фокуса
+const handleMaxCopiesBlur = () => {
+  if (maxCopies === '') return;
+  
+  const numValue = parseInt(maxCopies, 10);
+  if (numValue < 1) {
+    setMaxCopies('1');
+  } else {
+    // Убираем ведущие нули
+    setMaxCopies(numValue.toString());
+  }
+};
 
   // Функции для работы с хранилищами
   const handleStorageTypeChange = (index, value) => {
@@ -119,14 +158,9 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
   };
 
   const removeStorage = (index) => {
-    if (storages.length > 1) {
-      const newStorages = [...storages];
-      newStorages.splice(index, 1);
-      setStorages(newStorages);
-    } else {
-      // Сбросить единственное хранилище
-      setStorages([{ type: '', path: '', mountPoint: '', isSaved: false }]);
-    }
+    const newStorages = [...storages];
+    newStorages.splice(index, 1);
+    setStorages(newStorages);
     
     // Очищаем ошибки для этого хранилища
     setErrors(prev => {
@@ -212,8 +246,10 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
     const scheduleData = { 
       isScheduleActive,
       name, 
+      description,
       frequency, 
       time,
+      maxCopies,
       isActive: isScheduleActive, // Добавляем состояние активности
       databases,
       storages: savedStorages,
@@ -243,6 +279,16 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Описание</label>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Введите описание при необходимости"
               />
             </div>
             
@@ -312,6 +358,19 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Максимальное количество копий</label>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                value={maxCopies}
+                onChange={handleMaxCopiesChange}
+                onBlur={handleMaxCopiesBlur}
                 required
               />
             </div>
@@ -529,7 +588,6 @@ const CreateScheduleModal = ({ onClose, onCreate }) => {
                               const newStorages = [...storages];
                               newStorages[index].isSaved = true;
                               setStorages(newStorages);
-                              setShowAddButton(true);
                             } else {
                               // Для нового хранилища: удаляем его
                               removeStorage(index);

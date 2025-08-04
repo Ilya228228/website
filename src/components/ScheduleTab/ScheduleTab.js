@@ -10,8 +10,10 @@ const ScheduleTab = () => {
     id: 1, 
     isScheduleActive: true,
     name: 'Основная копия', 
+    description: 'Лабубу Лабубу Лабубу Лабубу Лабубу Лабубу Лабубу Лабубу Лабубу Лабубу',
     frequency: 'daily', 
     time: '02:00',
+    maxCopies: '19',
     databases: { db1: true, db2: true, db3: true, db4: true, db5: true },
     storages: [
       { type: 'local', path: '/var/backups' }
@@ -23,6 +25,7 @@ const ScheduleTab = () => {
     name: 'Финансовая', 
     frequency: 'weekly', 
     time: '04:30',
+    maxCopies: '28',
     weeklyDays: ['Пн', 'Ср', 'Пт'],
     databases: { db1: true, db2: false, db3: true, db4: false, db5: true },
     storages: [
@@ -36,6 +39,7 @@ const ScheduleTab = () => {
     name: 'Архивная', 
     frequency: 'monthly', 
     time: '23:00',
+    maxCopies: '3',
     monthlyDays: [15],
     databases: { db1: false, db2: false, db3: true, db4: false, db5: false },
     storages: [

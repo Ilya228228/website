@@ -110,6 +110,7 @@ h1 {
 
 .schedule-item {
   display: flex;
+  font-size: 14px;
   justify-content: space-between;
   align-items: center;
   padding: 15px;
@@ -120,6 +121,7 @@ h1 {
 .schedule-actions {
   display: flex;
   gap: 10px;
+  align-self: start;
 }
 
 .icon-btn {
@@ -317,9 +319,9 @@ th {
 
 /* Стили для отображения расписания */
 .schedule-details {
-  margin-top: 8px;
+  margin-bottom: 14px;
+  margin-top: 14px;
   font-size: 14px;
-  color: #495057;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -569,12 +571,6 @@ select.error,
   border-color: #e74c3c;
 }
 
-.schedule-storages {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #495057;
-}
-
 .storages-list {
   margin-top: 4px;
 }
@@ -627,8 +623,9 @@ select.error,
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
-  align-self: center;
   position: absolute;
+  margin-top: 6px;
+  margin-left: -25px;
 }
 
 .status-indicator.active {
@@ -807,4 +804,94 @@ select.error,
 
 .icon-btn:hover {
   background: #f0f4ff;
+}
+
+.description {
+  margin-top: -6px;
+  color: #495057;
+}
+
+.maxCopies span {
+  margin-left: 4px;
+  font-size: 15px;
+  color: #495057;
+}
+
+/* Стили для контейнера с базами */
+.schedule-databases {
+  display: flex;
+  align-items: center;
+  margin: 3px 0;
+}
+
+/* Контейнер для тегов */
+.database-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-left: 5px;
+}
+
+/* Стиль для каждого тега базы */
+.database-tag {
+  background-color: #e3f2fd;
+  color: var(--secondary);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Стили для блока хранилищ */
+.schedule-storages {
+  margin-top: 0px;
+}
+
+.schedule-storages > span {
+  margin-bottom: 10px;
+}
+
+.storages-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+/* Стили для отдельного блока хранилища */
+.storage-block {
+  border: none;
+  background-color: #f7f7f7;
+  max-height: 100px;
+  min-width: 250px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.storage-type {
+  margin-top: -5px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.storage-path {
+  font-size: 13px;
+  color: #6c727f;
+  word-break: break-all;
+  font-weight: 400;
+  margin-bottom: -4px
+}
+
+.storage-mount-point {
+  font-size: 13px;
+  color: #858c97;
+  font-weight: 400;
+  margin-bottom: -10px;
+}
+
+.arrow {
+  display: inline-block;
+  margin-top: -3px;
+  margin-right: 3px;
+  font-weight: 700;
+  color: #858c97;
 }
