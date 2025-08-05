@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './../../styles/modal.css';
 
 const EditScheduleModal = ({ onClose, onSave, schedule }) => {
-  // Состояния формы
+  // Состояния, инициализированные из расписания
   const [name, setName] = useState(schedule.name);
   const [description, setDescription] = useState(schedule.description);
   const [frequency, setFrequency] = useState(schedule.frequency);
@@ -10,20 +10,22 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
   const [maxCopies, setMaxCopies] = useState(schedule.maxCopies);
   const [selectedDays, setSelectedDays] = useState(schedule.weeklyDays || []);
   const [selectedMonthDays, setSelectedMonthDays] = useState(schedule.monthlyDays || []);
+  const [isScheduleActive, setIsScheduleActive] = useState(schedule.isScheduleActive);
   const [storages, setStorages] = useState(
     schedule.storages.map(s => ({ 
       ...s, 
       isSaved: true,
+      wasSaved: true,
       isExisting: true // Флаг для существующих хранилищ
     }))
   );
+  const [showAddButton, setShowAddButton] = useState(true);
   const [errors, setErrors] = useState({});
-  const [isScheduleActive, setIsScheduleActive] = useState(schedule.isScheduleActive);
 
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const daysOfMonth = Array.from({ length: 27 }, (_, i) => i + 1);
 
-  // Обработчики изменений
+  // Обработчики изменений (оставлены без изменений)
   const handleMaxCopiesChange = (e) => {
     const value = e.target.value;
     if (value === '') {
@@ -41,41 +43,39 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
     setMaxCopies(numValue < 1 ? '1' : numValue.toString());
   };
 
-  const toggleDay = (day) => {
-    setSelectedDays(prev => 
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
+  const handleStorageTypeChange = (index, value) => {
+    const newStorages = [...storages];
+    newStorages[index].type = value;
+    if (value === 'local') {
+      newStorages[index].mountPoint = '';
+    }
+    setStorages(newStorages);
   };
 
-  const toggleMonthDay = (day) => {
-    setSelectedMonthDays(prev => 
-      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
-    );
+  const handleStoragePathChange = (index, value) => {
+    const newStorages = [...storages];
+    newStorages[index].path = value;
+    setStorages(newStorages);
   };
 
-  const toggleScheduleActive = () => {
-    setIsScheduleActive(!isScheduleActive);
+  const handleMountPointChange = (index, value) => {
+    const newStorages = [...storages];
+    newStorages[index].mountPoint = value;
+    setStorages(newStorages);
   };
 
-  // Добавление нового хранилища
   const addStorage = () => {
     setStorages([...storages, { 
       type: '', 
       path: '', 
       mountPoint: '', 
       isSaved: false, 
-      isExisting: false // Флаг для новых хранилищ
+      wasSaved: false,
+      isExisting: false // Новое хранилище
     }]);
+    setShowAddButton(false);
   };
 
-  // Редактирование хранилища
-  const editStorage = (index) => {
-    const newStorages = [...storages];
-    newStorages[index].isSaved = false;
-    setStorages(newStorages);
-  };
-
-  // Сохранение хранилища
   const saveStorage = (index) => {
     const storage = storages[index];
     const newErrors = {};
@@ -109,6 +109,7 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
 
     const newStorages = [...storages];
     newStorages[index].isSaved = true;
+    newStorages[index].wasSaved = true; 
     setStorages(newStorages);
     
     setErrors(prev => {
@@ -118,9 +119,9 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
       }
       return newErrors;
     });
+    setShowAddButton(true);
   };
 
-  // Удаление хранилища
   const removeStorage = (index) => {
     const newStorages = [...storages];
     newStorages.splice(index, 1);
@@ -133,24 +134,49 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
       }
       return newErrors;
     });
+    
+    if (storages.filter((s, i) => i !== index && !s.isSaved).length === 0) {
+      setShowAddButton(true);
+    }
   };
 
-  // Сохранение всего расписания
+  const toggleScheduleActive = () => {
+    setIsScheduleActive(!isScheduleActive);
+  };
+
+  const toggleDay = (day) => {
+    setSelectedDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
+
+  const toggleMonthDay = (day) => {
+    setSelectedMonthDays(prev => 
+      prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]
+    );
+  };
+
+  // Обработка отправки формы
   const handleSubmit = (e) => {
     e.preventDefault();
     
     const newErrors = {};
     let hasError = false;
     
-    // Проверяем, что все хранилища сохранены
-    const unsavedStorages = storages.filter(s => !s.isSaved);
-    if (unsavedStorages.length > 0) {
-      newErrors.storagesGlobal = 'Сохраните все хранилища перед сохранением расписания';
+    // Убрана валидация баз данных (они не редактируются)
+    
+    if (frequency === 'weekly' && selectedDays.length === 0) {
+      newErrors.weekly = 'Выберите хотя бы один день недели';
       hasError = true;
     }
     
-    // Проверяем, что есть хотя бы одно хранилище
-    if (storages.length === 0) {
+    if (frequency === 'monthly' && selectedMonthDays.length === 0) {
+      newErrors.monthly = 'Выберите хотя бы один день месяца';
+      hasError = true;
+    }
+    
+    const savedStorages = storages.filter(s => s.isSaved);
+    if (savedStorages.length === 0) {
       newErrors.storagesGlobal = 'Необходимо добавить хотя бы одно хранилище';
       hasError = true;
     }
@@ -171,7 +197,7 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
       frequency, 
       time,
       maxCopies,
-      storages: storages.map(({ isSaved, isExisting, ...rest }) => rest),
+      storages: savedStorages.map(({ isSaved, wasSaved, isExisting, ...rest }) => rest),
       ...(frequency === 'weekly' && { weeklyDays: selectedDays }),
       ...(frequency === 'monthly' && { monthlyDays: selectedMonthDays })
     };
@@ -307,6 +333,7 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
               </div>
             </div>
             
+            {/* Блок выбора баз данных - ЗАБЛОКИРОВАН */}
             <div className="form-group">
               <header>Компоненты</header>
               <div className="databases-grid">
@@ -361,6 +388,7 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
               </div>
             </div>
             
+            {/* Блок хранилищ - с измененной логикой */}
             <div className="form-group-storage">
               <header style={{fontSize: 'larger'}}>Хранилища</header>
               {errors.storagesGlobal && <div className="error-message">{errors.storagesGlobal}</div>}
@@ -368,15 +396,16 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
               {storages.map((storage, index) => {
                 const storageError = errors.storages?.[index] || {};
                 
-                let storageBlockClass = 'storage-saved';
-                if (!storage.isSaved) {
+                let storageBlockClass = 'storage-adding';
+                if (storage.isSaved) {
+                  storageBlockClass = 'storage-saved';
+                } else if (storage.wasSaved) {
                   storageBlockClass = 'storage-editing';
                 }
                 
                 return (
                   <div key={index} className={storageBlockClass}>
                     {storage.isSaved ? (
-                      // Режим просмотра сохраненного хранилища
                       <div className="storage-view">
                         <div className="storage-info">
                           <span className="storage-value">
@@ -399,11 +428,16 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
                         </div>
                         
                         <div className="storage-actions">
+                          {/* Для новых хранилищ показываем кнопку редактирования */}
                           {!storage.isExisting && (
                             <button 
                               type="button" 
                               className="icon-btn"
-                              onClick={() => editStorage(index)}
+                              onClick={() => {
+                                const newStorages = [...storages];
+                                newStorages[index].isSaved = false;
+                                setStorages(newStorages);
+                              }}
                               title="Изменить"
                             >
                               <svg
@@ -431,10 +465,9 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
                         </div>
                       </div>
                     ) : (
-                      // Режим редактирования хранилища
                       <div className="storage-edit">
                         <div className="storage-info-header">
-                          {storage.isExisting ? 'Редактировать хранилище' : 'Добавить новое хранилище'}
+                          {storage.wasSaved ? 'Редактировать хранилище' : 'Добавить новое хранилище'}
                         </div>
 
                         <div className='storage-info-red'>
@@ -444,11 +477,7 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
                         <div className="storage-row">
                           <select
                             value={storage.type}
-                            onChange={(e) => {
-                              const newStorages = [...storages];
-                              newStorages[index].type = e.target.value;
-                              setStorages(newStorages);
-                            }}
+                            onChange={(e) => handleStorageTypeChange(index, e.target.value)}
                             className={storageError.type ? 'error' : ''}
                           >
                             <option value="" disabled hidden>Выберите тип</option>
@@ -465,11 +494,7 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
                             type="text"
                             placeholder="/path/to/storage"
                             value={storage.path}
-                            onChange={(e) => {
-                              const newStorages = [...storages];
-                              newStorages[index].path = e.target.value;
-                              setStorages(newStorages);
-                            }}
+                            onChange={(e) => handleStoragePathChange(index, e.target.value)}
                             className={storageError.path ? 'error' : ''}
                           />
                           {storageError.path && <div className="error-message">{storageError.path}</div>}
@@ -482,11 +507,7 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
                               type="text"
                               placeholder="Точка монтирования"
                               value={storage.mountPoint}
-                              onChange={(e) => {
-                                const newStorages = [...storages];
-                                newStorages[index].mountPoint = e.target.value;
-                                setStorages(newStorages);
-                              }}
+                              onChange={(e) => handleMountPointChange(index, e.target.value)}
                               className={storageError.mountPoint ? 'error' : ''}
                             />
                             {storageError.mountPoint && <div className="error-message">{storageError.mountPoint}</div>}
@@ -499,19 +520,17 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
                             className="btn save-storage-btn"
                             onClick={() => saveStorage(index)}
                           >
-                            Сохранить
+                            {storage.wasSaved ? 'Сохранить изменения' : 'Добавить хранилище'}
                           </button>
                           <button 
                             type="button" 
                             className="btn cancel-storage-btn"
                             onClick={() => {
-                              if (storage.isExisting) {
-                                // Возвращаем в режим просмотра
+                              if (storage.wasSaved) {
                                 const newStorages = [...storages];
                                 newStorages[index].isSaved = true;
                                 setStorages(newStorages);
                               } else {
-                                // Удаляем новое хранилище
                                 removeStorage(index);
                               }
                             }}
@@ -525,13 +544,15 @@ const EditScheduleModal = ({ onClose, onSave, schedule }) => {
                 );
               })}
               
-              <button 
-                type="button" 
-                className="btn add-storage-btn"
-                onClick={addStorage}
-              >
-                + Добавить хранилище
-              </button>
+              {showAddButton && (
+                <button 
+                  type="button" 
+                  className="btn add-storage-btn"
+                  onClick={addStorage}
+                >
+                  + Добавить хранилище
+                </button>
+              )}
             </div>
             
             <div className="form-actions">
